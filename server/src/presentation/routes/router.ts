@@ -9,10 +9,11 @@ export const setupRoutes = (app: Express): void => {
   app.get("/api/v1/health", healthCheck);
   app.get("/api/v1/crypto/sentiment", fearAndGreed.getIndex);
   app.get("/api/v1/market/capitulation", cryptoRules.getCapitulation);
-  app.get(
-    "/api/v1/market/newCapitulation",
-    marketController.getGainers
-  );
+  app.get("/api/v1/market/newCapitulation", marketController.getMarketMovers);
+  app.get("/api/v1/market/top-gainers", marketController.getTopGainers);
+  app.get("/api/v1/market/top-losers", marketController.getTopLosers);
+  app.get("/api/v1/market/global", marketController.getGlobalMarket);
+  app.get("/api/v1/market/btc-dominance", marketController.getBTCDominance);
 
   // 404 handler
   app.use("*", (req, res) => {

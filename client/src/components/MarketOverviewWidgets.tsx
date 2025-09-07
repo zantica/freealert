@@ -24,18 +24,25 @@ interface GlobalData {
 }
 
 interface CoinMovers {
-  id: string;
-  name: string;
   symbol: string;
-  current_price: number;
-  price_change_percentage_24h: number;
-  market_cap_rank: number;
+  lastPrice: number;
+  highPrice: number;
+  lowPrice: number;
+  volume: number;
+  tradeCount: number;
+  priceChangePercent: number;
+  priceChange: number;
+  openPrice: number;
 }
 
 interface MarketData {
   global: GlobalData | null;
   topGainers: CoinMovers[];
   topLosers: CoinMovers[];
+  btcDominance: {
+    btcDominance: number;
+    ethDominance: number;
+  } | null;
 }
 
 const MarketOverviewWidgets: React.FC = () => {
@@ -43,6 +50,7 @@ const MarketOverviewWidgets: React.FC = () => {
     global: null,
     topGainers: [],
     topLosers: [],
+    btcDominance: null,
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
@@ -55,42 +63,38 @@ const MarketOverviewWidgets: React.FC = () => {
 
       // Fetch global data
       const globalResponse = await fetch(
-        "https://api.coingecko.com/api/v3/global"
-      );
-      const globalData = await globalResponse.json();
-
-      // Fetch coins for gainers/losers (top 100 by market cap)
-      // const coinsResponse = await fetch(
-      //   'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false'
-      // );
-      const coinsResponse = await fetch(
-        "http://localhost:3000/api/v1/market/newCapitulation"
-      );
-      const coinsData: CoinMovers[] = await coinsResponse.json();
+        "http://localhost:3000/api/v1/market/global"
+      ).then((res) => res.json());
+      console.log("Global Data:", globalResponse);
+      const globalData = globalResponse;
 
       // Sort by price change to get gainers and losers
-      const sortedGainers = [...coinsData]
-        .filter((coin) => coin.price_change_percentage_24h > 0)
-        .sort(
-          (a, b) =>
-            b.price_change_percentage_24h - a.price_change_percentage_24h
-        )
-        .slice(0, 3);
+      const gainersResponse = await fetch(
+        "http://localhost:3000/api/v1/market/top-gainers?limit=3"
+      );
+      const losersResponse = await fetch(
+        "http://localhost:3000/api/v1/market/top-losers?limit=3"
+      );
 
-      const sortedLosers = [...coinsData]
-        .filter((coin) => coin.price_change_percentage_24h < 0)
-        .sort(
-          (a, b) =>
-            a.price_change_percentage_24h - b.price_change_percentage_24h
-        )
-        .slice(0, 3);
+      const btcDominance = await fetch(
+        "http://localhost:3000/api/v1/market/btc-dominance"
+      ).then((res) => res.json());
+
+      const gainersData: CoinMovers[] = await gainersResponse.json();
+      const losersData: CoinMovers[] = await losersResponse.json();
 
       setMarketData({
-        global: globalData.data,
-        topGainers: sortedGainers,
-        topLosers: sortedLosers,
+        global: globalData,
+        topGainers: gainersData,
+        topLosers: losersData,
+        btcDominance: btcDominance,
       });
-
+      console.log("Market Data:", {
+        global: globalData,
+        topGainers: gainersData,
+        topLosers: losersData,
+        btcDominance,
+      });
       setLastUpdate(new Date());
     } catch (err) {
       const errorMessage =
@@ -113,25 +117,25 @@ const MarketOverviewWidgets: React.FC = () => {
 
   const formatNumber = (num: number): string => {
     if (num >= 1e12) {
-      return `$${(num / 1e12).toFixed(2)}T`;
+      return `$${num / 1e12}T`;
     } else if (num >= 1e9) {
-      return `$${(num / 1e9).toFixed(2)}B`;
+      return `$${num / 1e9}B`;
     } else if (num >= 1e6) {
-      return `$${(num / 1e6).toFixed(2)}M`;
+      return `$${num / 1e6}M`;
     }
-    return `$${num.toFixed(2)}`;
+    return `$${num}`;
   };
 
   const formatPrice = (price: number): string => {
     if (price >= 1) {
-      return `$${price.toFixed(2)}`;
+      return `$${price}`;
     }
-    return `$${price.toFixed(6)}`;
+    return `$${price}`;
   };
 
   const formatPercentage = (percentage: number): string => {
     const sign = percentage >= 0 ? "+" : "";
-    return `${sign}${percentage.toFixed(2)}%`;
+    return `${sign}${percentage}%`;
   };
 
   if (loading && !marketData.global) {
@@ -241,14 +245,14 @@ const MarketOverviewWidgets: React.FC = () => {
             </h3>
           </div>
 
-          {marketData.global && (
+          {marketData.btcDominance && (
             <>
               <div className="mb-3">
                 <div className="text-2xl font-bold text-orange-400">
-                  {marketData.global.market_cap_percentage.btc.toFixed(1)}%
+                  {marketData.btcDominance.btcDominance}%
                 </div>
                 <div className="text-sm text-slate-300">
-                  ETH: {marketData.global.market_cap_percentage.eth.toFixed(1)}%
+                  ETH: {marketData.btcDominance.ethDominance}%
                 </div>
               </div>
 
@@ -258,7 +262,7 @@ const MarketOverviewWidgets: React.FC = () => {
                   <div
                     className="bg-gradient-to-r from-orange-500 to-orange-600 h-2 rounded-full transition-all duration-1000"
                     style={{
-                      width: `${marketData.global.market_cap_percentage.btc}%`,
+                      width: `${marketData.btcDominance.btcDominance}%`,
                     }}
                   ></div>
                 </div>
@@ -325,13 +329,13 @@ const MarketOverviewWidgets: React.FC = () => {
           <div className="space-y-3">
             {marketData.topGainers.map((coin, index) => (
               <div
-                key={coin.id}
+                key={coin.symbol}
                 className="flex items-center justify-between p-3 bg-slate-700/30 rounded-lg"
               >
                 <div className="flex items-center gap-3">
                   <span className="text-slate-400 text-sm">#{index + 1}</span>
                   <div>
-                    <div className="font-medium text-white">{coin.name}</div>
+                    <div className="font-medium text-white">{coin.symbol}</div>
                     <div className="text-xs text-slate-400">
                       {coin.symbol.toUpperCase()}
                     </div>
@@ -339,10 +343,10 @@ const MarketOverviewWidgets: React.FC = () => {
                 </div>
                 <div className="text-right">
                   <div className="text-white font-medium">
-                    {formatPrice(coin.current_price)}
+                    {formatPrice(coin.lastPrice)}
                   </div>
                   <div className="text-green-400 text-sm font-medium">
-                    +{coin.price_change_percentage_24h.toFixed(2)}%
+                    +{coin.priceChangePercent}%
                   </div>
                 </div>
               </div>
@@ -360,13 +364,13 @@ const MarketOverviewWidgets: React.FC = () => {
           <div className="space-y-3">
             {marketData.topLosers.map((coin, index) => (
               <div
-                key={coin.id}
+                key={coin.symbol}
                 className="flex items-center justify-between p-3 bg-slate-700/30 rounded-lg"
               >
                 <div className="flex items-center gap-3">
                   <span className="text-slate-400 text-sm">#{index + 1}</span>
                   <div>
-                    <div className="font-medium text-white">{coin.name}</div>
+                    <div className="font-medium text-white">{coin.symbol}</div>
                     <div className="text-xs text-slate-400">
                       {coin.symbol.toUpperCase()}
                     </div>
@@ -374,10 +378,10 @@ const MarketOverviewWidgets: React.FC = () => {
                 </div>
                 <div className="text-right">
                   <div className="text-white font-medium">
-                    {formatPrice(coin.current_price)}
+                    {formatPrice(coin.lastPrice)}
                   </div>
                   <div className="text-red-400 text-sm font-medium">
-                    {coin.price_change_percentage_24h.toFixed(2)}%
+                    {coin.priceChangePercent}%
                   </div>
                 </div>
               </div>

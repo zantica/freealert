@@ -18,22 +18,40 @@ export class BinanceAdapter {
       volume: parseFloat(candle[5]),
     }));
   }
-
+  
   async getTicker24h(symbol?: string) {
     const path = `${this.baseUrl}api/v3/ticker/24hr`;
-    console.log('Ticker 24h Path:', path);
     const res = await axios.get(path, {
-      params: { symbol },
+      params: symbol ? { symbol } : {},
     });
+    
+    console.log("Individual Ticker Result:", res.data.symbol);
+    // Si es un array (sin símbolo específico), devolver el array completo
+    if (Array.isArray(res.data)) {
+      return res.data.map((ticker: any) => ({
+        symbol: ticker.symbol,
+        lastPrice: parseFloat(ticker.lastPrice) || 0,
+        highPrice: parseFloat(ticker.highPrice) || 0,
+        lowPrice: parseFloat(ticker.lowPrice) || 0,
+        volume: parseFloat(ticker.volume) || 0,
+        tradeCount: parseInt(ticker.count, 10) || 0,
+        priceChangePercent: parseFloat(ticker.priceChangePercent) || 0,
+        priceChange: parseFloat(ticker.priceChange) || 0,
+        openPrice: parseFloat(ticker.openPrice) || 0,
+      }));
+    }
 
-    console.log('Ticker 24h Response:', res);
+    // Si es un objeto individual (con símbolo específico)
     return {
-      lastPrice: parseFloat(res.data.lastPrice),
-      highPrice: parseFloat(res.data.highPrice),
-      lowPrice: parseFloat(res.data.lowPrice),
-      volume: parseFloat(res.data.volume),
-      tradeCount: parseInt(res.data.count, 10),
-      priceChangePercent: parseInt(res.data.priceChangePercent, 10),
+      symbol: res.data.symbol,
+      lastPrice: parseFloat(res.data.lastPrice) || 0,
+      highPrice: parseFloat(res.data.highPrice) || 0,
+      lowPrice: parseFloat(res.data.lowPrice) || 0,
+      volume: parseFloat(res.data.volume) || 0,
+      tradeCount: parseInt(res.data.count, 10) || 0,
+      priceChangePercent: parseFloat(res.data.priceChangePercent) || 0,
+      priceChange: parseFloat(res.data.priceChange) || 0,
+      openPrice: parseFloat(res.data.openPrice) || 0,
     };
   }
 
