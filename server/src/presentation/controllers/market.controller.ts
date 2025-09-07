@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { BinanceAdapter } from "@infrastructure/external-apis/BinanceAdapter";
+import { BinanceAdapter } from "../../infrastructure/external-apis/BinanceAdapter";
 import { GetCapitulationMeter } from "@application/services/GetCapitulationMeter";
 
 const binance = new BinanceAdapter();

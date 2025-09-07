@@ -1,4 +1,4 @@
-import { BinanceAdapter } from "@infrastructure/external-apis/BinanceAdapter";
+import { BinanceAdapter } from "../../infrastructure/external-apis/BinanceAdapter";
 import { CapitulationSignal } from "@domain/market/CapitulationMeter";
 
 interface Candle {
