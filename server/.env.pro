@@ -1,0 +1,6 @@
+NODE_ENV=development
+PORT=3000
+CLIENT_URL=https://freealert.vercel.app/
+BNB_BASE_URL=https://api.binance.com/
+COINGECKO_BASE_URL=https://api.coingecko.com/api/v3
+FEAR_GREED_BASE_URL=https://api.alternative.me/
