@@ -1,5 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { TrendingUp, TrendingDown, DollarSign, Crown, Activity, RefreshCw } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import {
+  TrendingUp,
+  TrendingDown,
+  DollarSign,
+  Crown,
+  Activity,
+  RefreshCw,
+} from "lucide-react";
 
 interface GlobalData {
   active_cryptocurrencies: number;
@@ -35,49 +42,61 @@ const MarketOverviewWidgets: React.FC = () => {
   const [marketData, setMarketData] = useState<MarketData>({
     global: null,
     topGainers: [],
-    topLosers: []
+    topLosers: [],
   });
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string>('');
+  const [error, setError] = useState<string>("");
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
 
   const fetchMarketData = async () => {
     try {
       setLoading(true);
-      setError('');
+      setError("");
 
       // Fetch global data
-      const globalResponse = await fetch('https://api.coingecko.com/api/v3/global');
+      const globalResponse = await fetch(
+        "https://api.coingecko.com/api/v3/global"
+      );
       const globalData = await globalResponse.json();
 
       // Fetch coins for gainers/losers (top 100 by market cap)
+      // const coinsResponse = await fetch(
+      //   'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false'
+      // );
       const coinsResponse = await fetch(
-        'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false'
+        "http://localhost:3000/api/v1/market/newCapitulation"
       );
       const coinsData: CoinMovers[] = await coinsResponse.json();
 
       // Sort by price change to get gainers and losers
       const sortedGainers = [...coinsData]
-        .filter(coin => coin.price_change_percentage_24h > 0)
-        .sort((a, b) => b.price_change_percentage_24h - a.price_change_percentage_24h)
+        .filter((coin) => coin.price_change_percentage_24h > 0)
+        .sort(
+          (a, b) =>
+            b.price_change_percentage_24h - a.price_change_percentage_24h
+        )
         .slice(0, 3);
 
       const sortedLosers = [...coinsData]
-        .filter(coin => coin.price_change_percentage_24h < 0)
-        .sort((a, b) => a.price_change_percentage_24h - b.price_change_percentage_24h)
+        .filter((coin) => coin.price_change_percentage_24h < 0)
+        .sort(
+          (a, b) =>
+            a.price_change_percentage_24h - b.price_change_percentage_24h
+        )
         .slice(0, 3);
 
       setMarketData({
         global: globalData.data,
         topGainers: sortedGainers,
-        topLosers: sortedLosers
+        topLosers: sortedLosers,
       });
 
       setLastUpdate(new Date());
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch market data';
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to fetch market data";
       setError(errorMessage);
-      console.error('Error fetching market data:', err);
+      console.error("Error fetching market data:", err);
     } finally {
       setLoading(false);
     }
@@ -85,10 +104,10 @@ const MarketOverviewWidgets: React.FC = () => {
 
   useEffect(() => {
     fetchMarketData();
-    
+
     // Update every 10 minutes (same as your alerts)
     const interval = setInterval(fetchMarketData, 10 * 60 * 1000);
-    
+
     return () => clearInterval(interval);
   }, []);
 
@@ -111,7 +130,7 @@ const MarketOverviewWidgets: React.FC = () => {
   };
 
   const formatPercentage = (percentage: number): string => {
-    const sign = percentage >= 0 ? '+' : '';
+    const sign = percentage >= 0 ? "+" : "";
     return `${sign}${percentage.toFixed(2)}%`;
   };
 
@@ -119,7 +138,10 @@ const MarketOverviewWidgets: React.FC = () => {
     return (
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {[...Array(3)].map((_, i) => (
-          <div key={i} className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
+          <div
+            key={i}
+            className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700"
+          >
             <div className="animate-pulse">
               <div className="h-6 bg-slate-600 rounded w-3/4 mb-4"></div>
               <div className="h-8 bg-slate-600 rounded w-1/2 mb-2"></div>
@@ -142,7 +164,7 @@ const MarketOverviewWidgets: React.FC = () => {
             disabled={loading}
             className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2 mx-auto"
           >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
             Retry
           </button>
         </div>
@@ -154,7 +176,6 @@ const MarketOverviewWidgets: React.FC = () => {
     <div className="space-y-6">
       {/* Market Overview Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        
         {/* Total Market Cap Widget */}
         <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
           <div className="flex items-center justify-between mb-4">
@@ -167,32 +188,45 @@ const MarketOverviewWidgets: React.FC = () => {
               disabled={loading}
               className="p-1 text-slate-400 hover:text-white hover:bg-slate-700 rounded transition-colors disabled:opacity-50"
             >
-              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+              <RefreshCw
+                className={`w-4 h-4 ${loading ? "animate-spin" : ""}`}
+              />
             </button>
           </div>
-          
+
           {marketData.global && (
             <>
               <div className="mb-3">
                 <div className="text-2xl font-bold text-white">
                   {formatNumber(marketData.global.total_market_cap.usd)}
                 </div>
-                <div className={`text-sm flex items-center gap-1 ${
-                  marketData.global.market_cap_change_percentage_24h_usd >= 0 
-                    ? 'text-green-400' 
-                    : 'text-red-400'
-                }`}>
-                  {marketData.global.market_cap_change_percentage_24h_usd >= 0 
-                    ? <TrendingUp className="w-4 h-4" />
-                    : <TrendingDown className="w-4 h-4" />
-                  }
-                  {formatPercentage(marketData.global.market_cap_change_percentage_24h_usd)} 24h
+                <div
+                  className={`text-sm flex items-center gap-1 ${
+                    marketData.global.market_cap_change_percentage_24h_usd >= 0
+                      ? "text-green-400"
+                      : "text-red-400"
+                  }`}
+                >
+                  {marketData.global.market_cap_change_percentage_24h_usd >=
+                  0 ? (
+                    <TrendingUp className="w-4 h-4" />
+                  ) : (
+                    <TrendingDown className="w-4 h-4" />
+                  )}
+                  {formatPercentage(
+                    marketData.global.market_cap_change_percentage_24h_usd
+                  )}{" "}
+                  24h
                 </div>
               </div>
-              
+
               <div className="text-xs text-slate-400">
-                <div>Volume: {formatNumber(marketData.global.total_volume.usd)}</div>
-                <div>{marketData.global.active_cryptocurrencies} active cryptos</div>
+                <div>
+                  Volume: {formatNumber(marketData.global.total_volume.usd)}
+                </div>
+                <div>
+                  {marketData.global.active_cryptocurrencies} active cryptos
+                </div>
               </div>
             </>
           )}
@@ -206,7 +240,7 @@ const MarketOverviewWidgets: React.FC = () => {
               BTC Dominance
             </h3>
           </div>
-          
+
           {marketData.global && (
             <>
               <div className="mb-3">
@@ -217,13 +251,15 @@ const MarketOverviewWidgets: React.FC = () => {
                   ETH: {marketData.global.market_cap_percentage.eth.toFixed(1)}%
                 </div>
               </div>
-              
+
               {/* Dominance Progress Bar */}
               <div className="space-y-2">
                 <div className="w-full bg-slate-700 rounded-full h-2">
-                  <div 
+                  <div
                     className="bg-gradient-to-r from-orange-500 to-orange-600 h-2 rounded-full transition-all duration-1000"
-                    style={{ width: `${marketData.global.market_cap_percentage.btc}%` }}
+                    style={{
+                      width: `${marketData.global.market_cap_percentage.btc}%`,
+                    }}
                   ></div>
                 </div>
                 <div className="text-xs text-slate-400">
@@ -242,26 +278,34 @@ const MarketOverviewWidgets: React.FC = () => {
               Market Pulse
             </h3>
           </div>
-          
+
           <div className="space-y-3">
             <div className="flex justify-between items-center">
               <span className="text-sm text-slate-300">Gainers</span>
-              <span className="text-green-400 font-medium">{marketData.topGainers.length}</span>
+              <span className="text-green-400 font-medium">
+                {marketData.topGainers.length}
+              </span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-sm text-slate-300">Losers</span>
-              <span className="text-red-400 font-medium">{marketData.topLosers.length}</span>
+              <span className="text-red-400 font-medium">
+                {marketData.topLosers.length}
+              </span>
             </div>
-            
+
             {marketData.global && (
-              <div className={`text-center p-2 rounded-lg ${
-                marketData.global.market_cap_change_percentage_24h_usd >= 0
-                  ? 'bg-green-400/10 text-green-400'
-                  : 'bg-red-400/10 text-red-400'
-              }`}>
+              <div
+                className={`text-center p-2 rounded-lg ${
+                  marketData.global.market_cap_change_percentage_24h_usd >= 0
+                    ? "bg-green-400/10 text-green-400"
+                    : "bg-red-400/10 text-red-400"
+                }`}
+              >
                 <div className="text-xs">Overall Market</div>
                 <div className="font-semibold">
-                  {marketData.global.market_cap_change_percentage_24h_usd >= 0 ? '📈 Bullish' : '📉 Bearish'}
+                  {marketData.global.market_cap_change_percentage_24h_usd >= 0
+                    ? "📈 Bullish"
+                    : "📉 Bearish"}
                 </div>
               </div>
             )}
@@ -271,26 +315,32 @@ const MarketOverviewWidgets: React.FC = () => {
 
       {/* Top Movers Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        
         {/* Top Gainers */}
         <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
           <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
             <TrendingUp className="text-green-400 w-5 h-5" />
             Top Gainers 24h
           </h3>
-          
+
           <div className="space-y-3">
             {marketData.topGainers.map((coin, index) => (
-              <div key={coin.id} className="flex items-center justify-between p-3 bg-slate-700/30 rounded-lg">
+              <div
+                key={coin.id}
+                className="flex items-center justify-between p-3 bg-slate-700/30 rounded-lg"
+              >
                 <div className="flex items-center gap-3">
                   <span className="text-slate-400 text-sm">#{index + 1}</span>
                   <div>
                     <div className="font-medium text-white">{coin.name}</div>
-                    <div className="text-xs text-slate-400">{coin.symbol.toUpperCase()}</div>
+                    <div className="text-xs text-slate-400">
+                      {coin.symbol.toUpperCase()}
+                    </div>
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-white font-medium">{formatPrice(coin.current_price)}</div>
+                  <div className="text-white font-medium">
+                    {formatPrice(coin.current_price)}
+                  </div>
                   <div className="text-green-400 text-sm font-medium">
                     +{coin.price_change_percentage_24h.toFixed(2)}%
                   </div>
@@ -306,19 +356,26 @@ const MarketOverviewWidgets: React.FC = () => {
             <TrendingDown className="text-red-400 w-5 h-5" />
             Top Losers 24h
           </h3>
-          
+
           <div className="space-y-3">
             {marketData.topLosers.map((coin, index) => (
-              <div key={coin.id} className="flex items-center justify-between p-3 bg-slate-700/30 rounded-lg">
+              <div
+                key={coin.id}
+                className="flex items-center justify-between p-3 bg-slate-700/30 rounded-lg"
+              >
                 <div className="flex items-center gap-3">
                   <span className="text-slate-400 text-sm">#{index + 1}</span>
                   <div>
                     <div className="font-medium text-white">{coin.name}</div>
-                    <div className="text-xs text-slate-400">{coin.symbol.toUpperCase()}</div>
+                    <div className="text-xs text-slate-400">
+                      {coin.symbol.toUpperCase()}
+                    </div>
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-white font-medium">{formatPrice(coin.current_price)}</div>
+                  <div className="text-white font-medium">
+                    {formatPrice(coin.current_price)}
+                  </div>
                   <div className="text-red-400 text-sm font-medium">
                     {coin.price_change_percentage_24h.toFixed(2)}%
                   </div>

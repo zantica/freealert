@@ -1,6 +1,6 @@
 import "./App.css";
 
-import FearGreedIndex from "./components/FearGreedIndex";
+// import FearGreedIndex from "./components/FearGreedIndex";
 // import CapitulationWidget from "./components/CapitulationWidget";
 import MultiColumnLayout from "./layout/MultiColumnLayout";
 // import CryptoMAAlerts from "./components/CryptoMAAlerts";
@@ -11,7 +11,7 @@ function App() {
     <MultiColumnLayout columns={2} title="">
       <MarketOverviewWidgets />
       {/* <CapitulationWidget /> */}
-      <FearGreedIndex />
+      {/* <FearGreedIndex /> */}
       {/* <CryptoMAAlerts /> */}
     </MultiColumnLayout>
   );

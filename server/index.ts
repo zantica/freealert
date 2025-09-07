@@ -5,9 +5,7 @@ import compression from "compression";
 import { errorHandler } from "./src/presentation/middleware/errorHandler";
 import { setupRoutes } from "./src/presentation/routes/router";
 import { config } from "./src/infrastructure/config/environment";
-
 const app = express();
-
 // Middleware de seguridad y optimización ANTES de las rutas
 app.use(helmet());
 app.use(

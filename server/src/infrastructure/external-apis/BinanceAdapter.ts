@@ -5,7 +5,7 @@ export class BinanceAdapter {
   private baseUrl = config.apis.binance.baseUrl;
 
   async getOHLC(symbol: string, interval: string = "1d", limit: number = 200) {
-    const res = await axios.get(`${this.baseUrl}/api/v3/klines`, {
+    const res = await axios.get(`${this.baseUrl}api/v3/klines`, {
       params: { symbol, interval, limit },
     });
     // [openTime, open, high, low, close, volume, ...]
@@ -19,21 +19,26 @@ export class BinanceAdapter {
     }));
   }
 
-  async getTicker24h(symbol: string) {
-    const res = await axios.get(`${this.baseUrl}/api/v3/ticker/24hr`, {
+  async getTicker24h(symbol?: string) {
+    const path = `${this.baseUrl}api/v3/ticker/24hr`;
+    console.log('Ticker 24h Path:', path);
+    const res = await axios.get(path, {
       params: { symbol },
     });
+
+    console.log('Ticker 24h Response:', res);
     return {
       lastPrice: parseFloat(res.data.lastPrice),
       highPrice: parseFloat(res.data.highPrice),
       lowPrice: parseFloat(res.data.lowPrice),
       volume: parseFloat(res.data.volume),
       tradeCount: parseInt(res.data.count, 10),
+      priceChangePercent: parseInt(res.data.priceChangePercent, 10),
     };
   }
 
   async getOrderBook(symbol: string, limit: number = 100) {
-    const res = await axios.get(`${this.baseUrl}/api/v3/depth`, {
+    const res = await axios.get(`${this.baseUrl}api/v3/depth`, {
       params: { symbol, limit },
     });
     const bids = res.data.bids.map((b: any) => [
