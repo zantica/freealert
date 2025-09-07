@@ -61,23 +61,25 @@ const MarketOverviewWidgets: React.FC = () => {
       setLoading(true);
       setError("");
 
+      const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
       // Fetch global data
       const globalResponse = await fetch(
-        "http://localhost:3000/api/v1/market/global"
+        `${API_BASE_URL}/api/v1/market/global`
       ).then((res) => res.json());
       console.log("Global Data:", globalResponse);
       const globalData = globalResponse;
 
       // Sort by price change to get gainers and losers
       const gainersResponse = await fetch(
-        "http://localhost:3000/api/v1/market/top-gainers?limit=3"
+        `${API_BASE_URL}/api/v1/market/top-gainers?limit=3`
       );
       const losersResponse = await fetch(
-        "http://localhost:3000/api/v1/market/top-losers?limit=3"
+        `${API_BASE_URL}/api/v1/market/top-losers?limit=3`
       );
 
       const btcDominance = await fetch(
-        "http://localhost:3000/api/v1/market/btc-dominance"
+        `${API_BASE_URL}/api/v1/market/btc-dominance`
       ).then((res) => res.json());
 
       const gainersData: CoinMovers[] = await gainersResponse.json();
