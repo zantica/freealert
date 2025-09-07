@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export class BinanceAdapter {
-  private baseUrl = "https://api.binance.com";
+  private baseUrl = process.env.BNB_BASE_URL;
 
   async getOHLC(symbol: string, interval: string = "1d", limit: number = 200) {
     const res = await axios.get(`${this.baseUrl}/api/v3/klines`, {

@@ -7,13 +7,13 @@ export const config = {
   },
   apis: {
     binance: {
-      baseUrl: "https://api.binance.com",
+      baseUrl: process.env.BNB_BASE_URL,
     },
     coingecko: {
-      baseUrl: "https://api.coingecko.com/api/v3",
+      baseUrl: process.env.COINGECKO_BASE_URL,
     },
     fearGreed: {
-      baseUrl: "https://api.alternative.me",
+      baseUrl: process.env.FEAR_GREED_BASE_URL,
     },
   },
 };
