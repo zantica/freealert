@@ -27,7 +27,6 @@ const FearGreedIndex: React.FC = () => {
       }
       
       const data = await response.json();
-      console.log("RESPOOOOOONSE", data);
 
       if (data.metadata?.error) {
         throw new Error(data.metadata.error);

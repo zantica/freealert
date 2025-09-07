@@ -251,7 +251,6 @@ const CryptoMAAlerts: React.FC = () => {
           ) : (
             <div className="space-y-3">
               {alerts.map((alert) => {
-                console.log("Alert:", alert);
                 const status = getAlertStatus(alert);
                 const statusColors = {
                   pending: "text-yellow-400 bg-yellow-400/10",

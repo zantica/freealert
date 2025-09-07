@@ -89,12 +89,7 @@ const MarketOverviewWidgets: React.FC = () => {
         topLosers: losersData,
         btcDominance: btcDominance,
       });
-      console.log("Market Data:", {
-        global: globalData,
-        topGainers: gainersData,
-        topLosers: losersData,
-        btcDominance,
-      });
+
       setLastUpdate(new Date());
     } catch (err) {
       const errorMessage =

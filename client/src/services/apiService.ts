@@ -93,7 +93,6 @@ export const priceService = {
     console.info(days);
     if (dataProviders.historicalData === "binance") {
       try {
-        console.log("Symbol:", symbol);
         const binanceSymbol = symbol.toUpperCase() + "USDT";
         const interval = days <= 30 ? "1d" : "1d";
         const limit = days;

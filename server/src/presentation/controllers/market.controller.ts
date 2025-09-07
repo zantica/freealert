@@ -97,7 +97,6 @@ export const marketController = {
           );
           break;
       }
-      console.log("Result:", order, result[0]);
       // Aplicar límite si se especifica
       if (limitNum) {
         result = result.slice(0, limitNum);
