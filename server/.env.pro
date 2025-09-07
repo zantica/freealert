@@ -1,4 +1,4 @@
-NODE_ENV=pro
+NODE_ENV=production
 PORT=3000
 CLIENT_URL=https://freealert.vercel.app/
 BNB_BASE_URL=https://api.binance.com/
