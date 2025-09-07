@@ -1,7 +1,8 @@
 import axios from "axios";
+import { config } from "../config/environment";
 
 export class BinanceAdapter {
-  private baseUrl = process.env.BNB_BASE_URL;
+  private baseUrl = config.apis.binance.baseUrl;
 
   async getOHLC(symbol: string, interval: string = "1d", limit: number = 200) {
     const res = await axios.get(`${this.baseUrl}/api/v3/klines`, {

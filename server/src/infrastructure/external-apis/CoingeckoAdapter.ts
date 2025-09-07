@@ -1,4 +1,5 @@
 import axios from "axios";
+import { config } from "../config/environment";
 
 interface MarketCoin {
   id: string;
@@ -33,7 +34,8 @@ interface FearGreedResponse {
 }
 
 export class CoingeckoAdapter {
-  private baseUrl = "https://api.coingecko.com/api/v3";
+  private baseUrl = config.apis.coingecko.baseUrl;
+  private fearGreedUrl = config.apis.fearGreed.baseUrl;
 
   async getCoinMarketData(id: string) {
     const res = await axios.get(`${this.baseUrl}/coins/${id}/market_chart`, {
@@ -56,10 +58,10 @@ export class CoingeckoAdapter {
     const [marketsResponse, globalResponse, fearGreedResponse] =
       await Promise.all([
         axios.get(
-          "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1"
+          `${this.baseUrl}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1`
         ),
-        axios.get("https://api.coingecko.com/api/v3/global"),
-        axios.get("https://api.alternative.me/fng/?limit=1"),
+        axios.get(`${this.baseUrl}/global`),
+        axios.get(`${process.env.FEAR_GREED_BASE_URL}/fng/?limit=1`),
       ]);
     return {
       marketsResponse,
@@ -80,7 +82,7 @@ export class CoingeckoAdapter {
             `${this.baseUrl}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1`
           ),
           axios.get<GlobalResponse>(`${this.baseUrl}/global`),
-          axios.get<FearGreedResponse>("https://api.alternative.me/fng/?limit=1"),
+          axios.get<FearGreedResponse>(`${this.fearGreedUrl}/fng/?limit=1`),
         ]);
 
       return {
@@ -89,8 +91,8 @@ export class CoingeckoAdapter {
         fearGreed: fearGreedResponse.data,
       };
     } catch (error) {
-      console.error('Error fetching capitulation data from APIs:', error);
-      throw new Error('Failed to fetch external API data');
+      console.error("Error fetching capitulation data from APIs:", error);
+      throw new Error("Failed to fetch external API data");
     }
   }
 }
