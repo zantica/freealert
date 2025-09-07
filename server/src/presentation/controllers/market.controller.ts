@@ -154,7 +154,7 @@ export const marketController = {
       const data = await fetch(
         "https://api.alternative.me/v2/ticker/?limit=300"
       );
-      const response = await data.json();
+      const response = (await data.json()) as { data: Record<string, any> };
 
       if (!response?.data) {
         throw new Error("No se pudo obtener la data de la API");

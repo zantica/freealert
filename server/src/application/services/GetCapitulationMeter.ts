@@ -1,12 +1,18 @@
 import { BinanceAdapter } from "@infrastructure/external-apis/BinanceAdapter";
 import { CapitulationSignal } from "@domain/market/CapitulationMeter";
 
+interface Candle {
+  close: number;
+  volume: number;
+  // add other properties if needed
+}
+
 export class GetCapitulationMeter {
   constructor(private binance: BinanceAdapter) {}
 
   async execute(symbol: string): Promise<CapitulationSignal> {
     // 1. OHLC para calcular MA200 y volumen promedio
-    const candles = await this.binance.getOHLC(symbol, "1d", 200);
+    const candles: Candle[] = await this.binance.getOHLC(symbol, "1d", 200);
     const closes = candles.map((c) => c.close);
     const volumes = candles.map((c) => c.volume);
 
@@ -25,8 +31,8 @@ export class GetCapitulationMeter {
 
     // 3. Order book para presión
     const orderBook = await this.binance.getOrderBook(symbol, 100);
-    const bidVol = orderBook.bids.reduce((a, b) => a + b[1], 0);
-    const askVol = orderBook.asks.reduce((a, b) => a + b[1], 0);
+    const bidVol = orderBook.bids.reduce((a: number, b: [number, number]) => a + b[1], 0);
+    const askVol = orderBook.asks.reduce((a: number, b: [number, number]) => a + b[1], 0);
     let orderBookPressure: "buy" | "sell" | "neutral" = "neutral";
     if (bidVol > askVol * 1.5) orderBookPressure = "buy";
     if (askVol > bidVol * 1.5) orderBookPressure = "sell";
@@ -45,7 +51,7 @@ export class GetCapitulationMeter {
       drawdown,
       belowMA200,
       volumeSpike,
-      tradeCount: ticker.tradeCount,
+      tradeCount: Array.isArray(ticker) ? ticker[0]?.tradeCount : ticker.tradeCount,
       orderBookPressure,
       capitulation,
     };
