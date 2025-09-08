@@ -17,7 +17,11 @@ export const config = {
   env: process.env.NODE_ENV || "development",
   port: parseInt(process.env.PORT || "3000", 10),
   cors: {
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    origin: process.env.CLIENT_URL || (
+      process.env.NODE_ENV === 'production' 
+        ? "https://freealert.vercel.app" 
+        : "http://localhost:5173"
+    ),
     credentials: true,
   },
   apis: {

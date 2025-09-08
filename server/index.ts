@@ -5,7 +5,9 @@ import compression from "compression";
 import { errorHandler } from "./src/presentation/middleware/errorHandler";
 import { setupRoutes } from "./src/presentation/routes/router";
 import { config } from "./src/infrastructure/config/environment";
+
 const app = express();
+
 // Middleware de seguridad y optimización ANTES de las rutas
 app.use(helmet());
 app.use(
@@ -26,18 +28,26 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`🏥 Health check: http://localhost:${PORT}/health`);
-});
+// Para Vercel, no necesitamos app.listen en producción
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`🏥 Health check: http://localhost:${PORT}/health`);
+  });
+}
 
-// Graceful shutdown
-process.on("SIGTERM", () => {
-  console.log("SIGTERM received, shutting down gracefully");
-  process.exit(0);
-});
+// Exportar la app para Vercel
+export default app;
 
-process.on("SIGINT", () => {
-  console.log("SIGINT received, shutting down gracefully");
-  process.exit(0);
-});
+// Graceful shutdown solo en desarrollo
+if (process.env.NODE_ENV !== 'production') {
+  process.on("SIGTERM", () => {
+    console.log("SIGTERM received, shutting down gracefully");
+    process.exit(0);
+  });
+
+  process.on("SIGINT", () => {
+    console.log("SIGINT received, shutting down gracefully");
+    process.exit(0);
+  });
+}
