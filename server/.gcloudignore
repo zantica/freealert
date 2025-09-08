@@ -1,0 +1,17 @@
+.gcloudignore
+.git
+.gitignore
+README.md
+node_modules/
+npm-debug.log
+.nyc_output
+tests/
+.env
+.env.*
+src/
+tsconfig.json
+jest.config.json
+*.test.ts
+*.test.js
+.vscode/
+coverage/

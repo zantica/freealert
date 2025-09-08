@@ -8,9 +8,9 @@ import { config } from "./src/infrastructure/config/environment";
 
 const app = express();
 
-// Middleware de seguridad y optimización ANTES de las rutas
+// Middleware de seguridad y optimización
 app.use(helmet({
-  crossOriginEmbedderPolicy: false, // Para Vercel
+  crossOriginEmbedderPolicy: false,
 }));
 
 app.use(
@@ -24,33 +24,30 @@ app.use(compression());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Health check básico
+// Health check para App Engine
 app.get('/health', (req, res) => {
   res.status(200).json({ 
     status: 'OK', 
     timestamp: new Date().toISOString(),
-    env: process.env.NODE_ENV 
+    env: process.env.NODE_ENV,
+    service: 'freealert-api'
   });
 });
 
-// Configurar rutas DESPUÉS de los middlewares
+// Configurar rutas
 setupRoutes(app);
 
-// Error handler al final
+// Error handler
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 3000;
+// Puerto para App Engine (usa PORT o 8080 por defecto)
+const PORT = process.env.PORT || 8080;
 
-// Para desarrollo local
-if (process.env.NODE_ENV !== 'production') {
-  app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
-    console.log(`🏥 Health check: http://localhost:${PORT}/health`);
-  });
-}
-
-// Exportar la app para Vercel
-export default app;
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`🏥 Health check: http://localhost:${PORT}/health`);
+  console.log(`🌍 Environment: ${process.env.NODE_ENV}`);
+});
 
 // Manejo de errores no capturados
 process.on('unhandledRejection', (reason, promise) => {

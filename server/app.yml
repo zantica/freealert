@@ -1,0 +1,37 @@
+runtime: nodejs18
+env: standard
+
+# Variables de entorno
+env_variables:
+  NODE_ENV: production
+  BNB_BASE_URL: "https://api.binance.com/"
+  COINGECKO_BASE_URL: "https://api.coingecko.com/api/v3"
+  FEAR_GREED_BASE_URL: "https://api.alternative.me/"
+  COINMARKETCAP_API_KEY: "a820ece4-4a62-4644-bf99-557041c53f24"
+  CLIENT_URL: "https://freealert.vercel.app"
+
+# Configuración de instancias
+automatic_scaling:
+  min_instances: 0
+  max_instances: 5
+  target_cpu_utilization: 0.6
+
+# Configuración de recursos
+resources:
+  cpu: 1
+  memory_gb: 0.5
+
+# Health checks
+readiness_check:
+  path: "/health"
+  check_interval_sec: 5
+  timeout_sec: 4
+  failure_threshold: 2
+  success_threshold: 2
+
+liveness_check:
+  path: "/health"
+  check_interval_sec: 30
+  timeout_sec: 4
+  failure_threshold: 4
+  success_threshold: 2
