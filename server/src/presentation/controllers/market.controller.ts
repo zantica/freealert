@@ -109,7 +109,6 @@ export const marketController = {
     }
   },
 
-  // Métodos específicos para mayor claridad
   getTopGainers: async (req: Request, res: Response) => {
     try {
       const { limit = "10" } = req.query;
@@ -149,6 +148,7 @@ export const marketController = {
       res.status(500).json({ error: (err as Error).message });
     }
   },
+
   getBTCDominance: async (req: Request, res: Response) => {
     try {
       const data = await fetch(
@@ -189,6 +189,27 @@ export const marketController = {
     } catch (err) {
       console.error("Error calculando la dominance:", err);
       return null;
+    }
+  },
+
+  get24hData: async (req: Request, res: Response) => {
+    const { symbol } = req.params;
+    console.log("Requested symbol:", symbol);
+    try {
+      if (!symbol) {
+        return res.status(400).json({ error: "Symbol is required" });
+      }
+      const tickers = await binance.getTicker24h();
+      const ticker = (tickers as any[]).find(
+        (t) => t.symbol.toUpperCase() === symbol.toUpperCase()
+      );
+      if (!ticker) {
+        return res.status(404).json({ error: "Ticker not found" });
+      }
+      res.json(ticker);
+    } catch (err) {
+      console.error("Error fetching 24h data:", err);
+      res.status(500).json({ error: (err as Error).message });
     }
   },
 };
