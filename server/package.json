@@ -4,15 +4,16 @@
   "description": "Crypto alerts backend with hexagonal architecture",
   "main": "index.ts",
   "scripts": {
-    "dev": "ts-node index.ts",
-    "build": "tsc",
     "start": "node dist/index.js",
     "gcp-build": "npm run build",
     "test": "jest",
     "lint": "eslint . --ext .ts",
-    "clean": "rimraf dist"
+    "clean": "rimraf dist",
+    "dev": "ts-node-dev server.ts",
+    "build": "tsc"
   },
   "dependencies": {
+    "@vercel/node": "^5.3.21",
     "axios": "^1.6.0",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
@@ -21,6 +22,7 @@
     "helmet": "^7.1.0",
     "node-cron": "^3.0.3",
     "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
     "tsconfig-paths": "^4.2.0"
   },
   "devDependencies": {
