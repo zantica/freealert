@@ -2,80 +2,52 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import compression from "compression";
-import dotenv from "dotenv";
-
-// Cargar variables de entorno al inicio
-dotenv.config();
+import { errorHandler } from "./src/presentation/middleware/errorHandler";
+import { setupRoutes } from "./src/presentation/routes/router";
+import { config } from "./src/infrastructure/config/environment";
 
 const app = express();
 
-// Middleware básico
+// Middleware de seguridad y optimización ANTES de las rutas
 app.use(helmet());
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
-    credentials: true,
+    origin: config.cors.origin, // Usa la configuración del environment
+    credentials: config.cors.credentials,
   })
 );
 app.use(compression());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Ruta de health check básica
-app.get("/", (req, res) => {
-  res.json({
-    message: "FreeAlert API is running",
-    timestamp: new Date().toISOString(),
-    env: process.env.NODE_ENV,
-  });
-});
+// Configurar rutas DESPUÉS de los middlewares
+setupRoutes(app);
 
-app.get("/health", (req, res) => {
-  res.json({
-    status: "OK",
-    timestamp: new Date().toISOString(),
-    env: process.env.NODE_ENV,
-  });
-});
+// Error handler al final
+app.use(errorHandler);
 
-// Importar y configurar rutas después de los middlewares básicos
-try {
-  const { setupRoutes } = require("./src/presentation/routes/router");
-  setupRoutes(app);
-} catch (error) {
-  console.error("Error loading routes:", error);
-  // Continuar sin las rutas personalizadas por ahora
-}
+const PORT = process.env.PORT || 3000;
 
-// Error handler global
-app.use(
-  (error: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-    console.error("Global error handler:", error);
-    res.status(500).json({
-      error: "Internal Server Error",
-      message:
-        process.env.NODE_ENV === "development"
-          ? error.message
-          : "Something went wrong",
-    });
-  }
-);
-
-// 404 handler
-app.use("*", (req, res) => {
-  res.status(404).json({
-    error: "Not Found",
-    message: `Route ${req.originalUrl} not found`,
-  });
-});
-
-// Para desarrollo local
-if (process.env.NODE_ENV !== "production") {
-  const PORT = process.env.PORT || 3000;
+// Para Vercel, no necesitamos app.listen en producción
+if (process.env.NODE_ENV !== 'production') {
   app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`🏥 Health check: http://localhost:${PORT}/health`);
   });
 }
 
-// Exportar para Vercel
+// Exportar la app para Vercel
 export default app;
+
+// Graceful shutdown solo en desarrollo
+if (process.env.NODE_ENV !== 'production') {
+  process.on("SIGTERM", () => {
+    console.log("SIGTERM received, shutting down gracefully");
+    process.exit(0);
+  });
+
+  process.on("SIGINT", () => {
+    console.log("SIGINT received, shutting down gracefully");
+    process.exit(0);
+  });
+}
