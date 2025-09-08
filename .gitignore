@@ -40,3 +40,4 @@ server/.cache/
 # Temporary files
 *.tmp
 *.temp
+.vercel
