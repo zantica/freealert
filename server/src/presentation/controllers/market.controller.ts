@@ -114,15 +114,8 @@ export const marketController = {
   getTopGainers: async (req: Request, res: Response) => {
     try {
       const { limit = "10" } = req.query;
-      const tickers = await binance.getTicker24h();
 
-      const gainers = (tickers as any[])
-        .filter((ticker) => parseFloat(ticker.priceChangePercent) > 0)
-        .sort(
-          (a, b) =>
-            parseFloat(b.priceChangePercent) - parseFloat(a.priceChangePercent)
-        )
-        .slice(0, parseInt(limit as string));
+      const gainers = await coinmarketcap.getGainers(limit as unknown as number);
 
       res.json(gainers);
     } catch (err) {
@@ -204,7 +197,6 @@ export const marketController = {
   },
   get24hData: async (req: Request, res: Response) => {
     const { symbol } = req.params;
-    console.log("Requested symbol:", symbol);
     try {
       if (!symbol) {
         return res.status(400).json({ error: "Symbol is required" });

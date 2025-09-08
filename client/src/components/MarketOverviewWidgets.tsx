@@ -25,14 +25,12 @@ interface GlobalData {
 
 interface CoinMovers {
   symbol: string;
-  lastPrice: number;
-  highPrice: number;
-  lowPrice: number;
-  volume: number;
-  tradeCount: number;
-  priceChangePercent: number;
-  priceChange: number;
-  openPrice: number;
+  quote: {
+    USD: {
+      price: number;
+      percent_change_24h: number;
+    };
+  };
 }
 
 interface MarketData {
@@ -61,7 +59,8 @@ const MarketOverviewWidgets: React.FC = () => {
       setLoading(true);
       setError("");
 
-      const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      const API_BASE_URL =
+        import.meta.env.VITE_API_URL || "http://localhost:3000";
 
       // Fetch global data
       const globalResponse = await fetch(
@@ -80,7 +79,6 @@ const MarketOverviewWidgets: React.FC = () => {
       const btcDominance = await fetch(
         `${API_BASE_URL}/api/v1/market/btc-dominance`
       ).then((res) => res.json());
-      console.log("BTC Dominance Data:", btcDominance);
       const gainersData: CoinMovers[] = await gainersResponse.json();
       const losersData: CoinMovers[] = await losersResponse.json();
 
@@ -323,30 +321,39 @@ const MarketOverviewWidgets: React.FC = () => {
           </h3>
 
           <div className="space-y-3">
-            {marketData.topGainers.map((coin, index) => (
-              <div
-                key={coin.symbol}
-                className="flex items-center justify-between p-3 bg-slate-700/30 rounded-lg"
-              >
-                <div className="flex items-center gap-3">
-                  <span className="text-slate-400 text-sm">#{index + 1}</span>
-                  <div>
-                    <div className="font-medium text-white">{coin.symbol}</div>
-                    <div className="text-xs text-slate-400">
-                      {coin.symbol.toUpperCase()}
+            {marketData.topGainers.map(
+              (coin, index) => (
+                (
+                  <div
+                    key={coin.symbol}
+                    className="flex items-center justify-between p-3 bg-slate-700/30 rounded-lg"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-slate-400 text-sm">
+                        #{index + 1}
+                      </span>
+                      <div>
+                        <div className="font-medium text-white">
+                          {coin.symbol}
+                        </div>
+                        <div className="text-xs text-slate-400">
+                          {coin.symbol.toUpperCase()}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-white font-medium">
+                        {formatPrice(Number(coin.quote?.USD?.price.toFixed(2)))}
+                      </div>
+                      <div className="text-green-400 text-sm font-medium">
+                        {Number(coin.quote?.USD?.percent_change_24h.toFixed(2))}
+                        %
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="text-right">
-                  <div className="text-white font-medium">
-                    {formatPrice(coin.lastPrice)}
-                  </div>
-                  <div className="text-green-400 text-sm font-medium">
-                    +{coin.priceChangePercent}%
-                  </div>
-                </div>
-              </div>
-            ))}
+                )
+              )
+            )}
           </div>
         </div>
 
@@ -358,30 +365,39 @@ const MarketOverviewWidgets: React.FC = () => {
           </h3>
 
           <div className="space-y-3">
-            {marketData.topLosers.map((coin, index) => (
-              <div
-                key={coin.symbol}
-                className="flex items-center justify-between p-3 bg-slate-700/30 rounded-lg"
-              >
-                <div className="flex items-center gap-3">
-                  <span className="text-slate-400 text-sm">#{index + 1}</span>
-                  <div>
-                    <div className="font-medium text-white">{coin.symbol}</div>
-                    <div className="text-xs text-slate-400">
-                      {coin.symbol.toUpperCase()}
+            {marketData.topLosers.map(
+              (coin, index) => (
+                (
+                  <div
+                    key={coin.symbol}
+                    className="flex items-center justify-between p-3 bg-slate-700/30 rounded-lg"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-slate-400 text-sm">
+                        #{index + 1}
+                      </span>
+                      <div>
+                        <div className="font-medium text-white">
+                          {coin.symbol}
+                        </div>
+                        <div className="text-xs text-slate-400">
+                          {coin.symbol.toUpperCase()}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-white font-medium">
+                        {Number(coin.quote?.USD?.price).toFixed(2)}
+                      </div>
+                      <div className="text-red-400 text-sm font-medium">
+                        {Number(coin.quote?.USD?.percent_change_24h).toFixed(2)}
+                        %
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="text-right">
-                  <div className="text-white font-medium">
-                    {formatPrice(coin.lastPrice)}
-                  </div>
-                  <div className="text-red-400 text-sm font-medium">
-                    {coin.priceChangePercent}%
-                  </div>
-                </div>
-              </div>
-            ))}
+                )
+              )
+            )}
           </div>
         </div>
       </div>
