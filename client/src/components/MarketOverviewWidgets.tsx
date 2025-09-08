@@ -67,7 +67,6 @@ const MarketOverviewWidgets: React.FC = () => {
       const globalResponse = await fetch(
         `${API_BASE_URL}/api/v1/market/global`
       ).then((res) => res.json());
-      console.log("Global Data:", globalResponse);
       const globalData = globalResponse;
 
       // Sort by price change to get gainers and losers
@@ -81,7 +80,7 @@ const MarketOverviewWidgets: React.FC = () => {
       const btcDominance = await fetch(
         `${API_BASE_URL}/api/v1/market/btc-dominance`
       ).then((res) => res.json());
-
+      console.log("BTC Dominance Data:", btcDominance);
       const gainersData: CoinMovers[] = await gainersResponse.json();
       const losersData: CoinMovers[] = await losersResponse.json();
 

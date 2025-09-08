@@ -13,7 +13,7 @@ export const setupRoutes = (app: Express): void => {
   app.get("/api/v1/market/top-gainers", marketController.getTopGainers);
   app.get("/api/v1/market/top-losers", marketController.getTopLosers);
   app.get("/api/v1/market/global", marketController.getGlobalMarket);
-  app.get("/api/v1/market/btc-dominance", marketController.getBTCDominance);
+  app.get("/api/v1/market/btc-dominance", marketController.getDominance);
   app.get("/api/v1/market/:symbol/24h", marketController.get24hData);
 
   // 404 handler

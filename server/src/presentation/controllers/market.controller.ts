@@ -1,8 +1,10 @@
 import { Request, Response } from "express";
 import { BinanceAdapter } from "../../infrastructure/external-apis/BinanceAdapter";
 import { GetCapitulationMeter } from "../../application/services/GetCapitulationMeter";
+import { CoinmarketcapAdapter } from "@/infrastructure/external-apis/CoinmarketcapAdapter";
 
 const binance = new BinanceAdapter();
+const coinmarketcap = new CoinmarketcapAdapter();
 const getCapitulation = new GetCapitulationMeter(binance);
 
 export const marketController = {
@@ -149,49 +151,57 @@ export const marketController = {
     }
   },
 
-  getBTCDominance: async (req: Request, res: Response) => {
+  // getBTCDominance: async (req: Request, res: Response) => {
+  //   try {
+  //     const data = await fetch(
+  //       "https://api.alternative.me/v2/ticker/?limit=300"
+  //     );
+  //     const response = (await data.json()) as { data: Record<string, any> };
+
+  //     if (!response?.data) {
+  //       throw new Error("No se pudo obtener la data de la API");
+  //     }
+
+  //     const coins = Object.values<any>(response.data);
+
+  //     let btcMarketCap = 0;
+  //     let ethMarketCap = 0;
+
+  //     const totalMarketCap = coins.reduce((acc, coin: any) => {
+  //       const marketCap = coin?.quotes?.USD?.market_cap ?? 0;
+
+  //       if (coin.symbol === "BTC") {
+  //         btcMarketCap = marketCap;
+  //       }
+
+  //       if (coin.symbol === "ETH") {
+  //         ethMarketCap = marketCap;
+  //       }
+
+  //       return acc + (marketCap > 0 ? marketCap : 0);
+  //     }, 0);
+
+  //     if (btcMarketCap === 0 || ethMarketCap === 0 || totalMarketCap === 0) {
+  //       throw new Error("No se pudo calcular la dominance");
+  //     }
+
+  //     const btcDominance = Math.floor((btcMarketCap / totalMarketCap) * 100);
+  //     const ethDominance = Math.floor((ethMarketCap / totalMarketCap) * 100);
+  //     res.status(200).json({ btcDominance, ethDominance });
+  //   } catch (err) {
+  //     console.error("Error calculando la dominance:", err);
+  //     return null;
+  //   }
+  // },
+  getDominance: async (req: Request, res: Response) => {
     try {
-      const data = await fetch(
-        "https://api.alternative.me/v2/ticker/?limit=300"
-      );
-      const response = (await data.json()) as { data: Record<string, any> };
-
-      if (!response?.data) {
-        throw new Error("No se pudo obtener la data de la API");
-      }
-
-      const coins = Object.values<any>(response.data);
-
-      let btcMarketCap = 0;
-      let ethMarketCap = 0;
-
-      const totalMarketCap = coins.reduce((acc, coin: any) => {
-        const marketCap = coin?.quotes?.USD?.market_cap ?? 0;
-
-        if (coin.symbol === "BTC") {
-          btcMarketCap = marketCap;
-        }
-
-        if (coin.symbol === "ETH") {
-          ethMarketCap = marketCap;
-        }
-
-        return acc + (marketCap > 0 ? marketCap : 0);
-      }, 0);
-
-      if (btcMarketCap === 0 || ethMarketCap === 0 || totalMarketCap === 0) {
-        throw new Error("No se pudo calcular la dominance");
-      }
-
-      const btcDominance = Math.floor((btcMarketCap / totalMarketCap) * 100);
-      const ethDominance = Math.floor((ethMarketCap / totalMarketCap) * 100);
-      res.status(200).json({ btcDominance, ethDominance });
+      const data = await coinmarketcap.getDominance();
+      res.status(200).json(data);
     } catch (err) {
-      console.error("Error calculando la dominance:", err);
-      return null;
+      console.error("Error fetching dominance data:", err);
+      res.status(500).json({ error: (err as Error).message });
     }
   },
-
   get24hData: async (req: Request, res: Response) => {
     const { symbol } = req.params;
     console.log("Requested symbol:", symbol);

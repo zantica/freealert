@@ -1,5 +1,42 @@
-node_modules
-dist
-*.log
-*.tsbuildinfo
+# Dependencies
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# Production builds
+client/build/
+client/dist/
+server/build/
+server/dist/
+
+# Environment variables
 .env
+.env.local
+.env.production
+client/.env*
+server/.env*
+
+# Logs
+*.log
+npm-debug.log*
+client/logs/
+server/logs/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Cache
+.cache/
+client/.cache/
+server/.cache/
+
+# Temporary files
+*.tmp
+*.temp
