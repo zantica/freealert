@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { BinanceAdapter } from "../../infrastructure/external-apis/BinanceAdapter";
 import { GetCapitulationMeter } from "../../application/services/GetCapitulationMeter";
-import { CoinmarketcapAdapter } from "@/infrastructure/external-apis/CoinmarketcapAdapter";
+import { CoinmarketcapAdapter } from "../../infrastructure/external-apis/CoinmarketcapAdapter";
 
 const binance = new BinanceAdapter();
 const coinmarketcap = new CoinmarketcapAdapter();
